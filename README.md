@@ -150,6 +150,51 @@ The `search` tool always uses `httpx` — DuckDuckGo's search endpoint doesn't r
 
 The default stays `httpx` so users who don't need the impersonation don't pay for the extra dependency.
 
+### Running with Docker
+
+A `Dockerfile` and `docker-compose.yml` are included for containerised deployments. The image uses **Streamable HTTP** transport on port **7070** and the **curl** fetch backend (Chrome TLS impersonation) by default.
+
+**Quick start with Docker Compose:**
+
+```bash
+# 1. Copy the example env file and customise as needed
+cp .env.example .env
+
+# 2. Build and start the server
+docker compose up --build
+```
+
+The server will be reachable at `http://localhost:7070/mcp`.
+
+**Environment configuration (`.env`):**
+
+Docker Compose automatically loads the `.env` file and passes the variables to the container. Supported variables:
+
+| Variable          | Values                          | Default    | Description                            |
+| ----------------- | ------------------------------- | ---------- | -------------------------------------- |
+| `DDG_SAFE_SEARCH` | `STRICT` \| `MODERATE` \| `OFF` | `MODERATE` | SafeSearch filtering level             |
+| `DDG_REGION`      | e.g. `us-en`, `de-de`, `wt-wt` | `wt-wt`    | Default region/language for searches   |
+
+**Running with plain Docker:**
+
+```bash
+docker build -t duckduckgo-mcp-server .
+docker run -p 7070:7070 \
+  -e DDG_SAFE_SEARCH=MODERATE \
+  -e DDG_REGION=wt-wt \
+  duckduckgo-mcp-server
+```
+
+**Overriding transport/port at runtime:**
+
+The `CMD` in the `Dockerfile` is the default; you can override it when running the container:
+
+```bash
+docker run -p 8000:8000 duckduckgo-mcp-server \
+  python -m duckduckgo_mcp_server.server \
+  --transport streamable-http --host 0.0.0.0 --port 8000 --fetch-backend auto
+```
+
 ### Development
 
 For local development:
