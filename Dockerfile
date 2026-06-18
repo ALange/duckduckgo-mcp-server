@@ -5,7 +5,12 @@ WORKDIR /app
 COPY . /app
 
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir .
+    && pip install --no-cache-dir ".[browser]"
 
-# MCP uses stdio, no port to expose.
-CMD ["python", "-m", "duckduckgo_mcp_server.server"]
+EXPOSE 7070
+
+CMD ["python", "-m", "duckduckgo_mcp_server.server", \
+     "--transport", "streamable-http", \
+     "--host", "0.0.0.0", \
+     "--port", "7070", \
+     "--fetch-backend", "curl"]
