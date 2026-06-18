@@ -1,0 +1,7 @@
+services:
+  duckduckgo-mcp-server:
+    build: .
+    ports:
+      - "7070:7070"
+    env_file:
+      - .env
